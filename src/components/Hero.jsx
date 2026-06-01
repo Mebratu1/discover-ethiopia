@@ -27,26 +27,13 @@ export default function Hero() {
       className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden"
       aria-label="Hero – Discover Ethiopia"
     >
-      {/* Video Background */}
+      {/* Background Image (AI-generated Simien Mountains) */}
       <div className="absolute inset-0 z-0" aria-hidden="true">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
+        <img
+          src="/images/hero-simien-mountains.png"
+          alt="Simien Mountains at sunrise with Gelada baboon silhouette"
           className="w-full h-full object-cover"
-          poster="https://images.unsplash.com/photo-1619546813926-a78fa6372cd2?w=1920&q=85"
-        >
-          <source
-            src="https://www.w3schools.com/howto/rain.mp4"
-            type="video/mp4"
-          />
-          <img
-            src="https://images.unsplash.com/photo-1619546813926-a78fa6372cd2?w=1920&q=85"
-            className="w-full h-full object-cover"
-            alt=""
-          />
-        </video>
+        />
 
         {/* Cinematic overlays */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/50 to-black/80" />

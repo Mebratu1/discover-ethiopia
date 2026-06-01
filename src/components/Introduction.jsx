@@ -56,13 +56,13 @@ export default function Introduction() {
           {/* Image stack */}
           <div className="relative h-[400px] hidden md:block" aria-hidden="true">
             <img
-              src="https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=600&q=80"
+              src="/images/lalibela-church.png"
               alt="Lalibela rock-hewn church"
               className="absolute top-0 right-0 w-3/4 h-64 object-cover rounded-2xl shadow-2xl"
               loading="lazy"
             />
             <img
-              src="https://images.unsplash.com/photo-1619546813926-a78fa6372cd2?w=600&q=80"
+              src="/images/hero-simien-mountains.png"
               alt="Simien Mountains"
               className="absolute bottom-0 left-0 w-3/5 h-52 object-cover rounded-2xl shadow-2xl border-4 border-[#080808]"
               loading="lazy"
