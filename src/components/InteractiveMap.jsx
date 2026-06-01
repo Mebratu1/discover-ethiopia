@@ -1,15 +1,15 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
-import { MapPin, X } from 'lucide-react';
+import { MapPin, X, ChevronRight } from 'lucide-react';
 
-const mapRegions = [
+const MAP_REGIONS = [
   {
     id: 'north',
     name: 'North Circuit',
     color: '#D4A017',
     description: 'The classic Ethiopian journey: Lalibela, Gondar, Simien Mountains, Bahir Dar. The historical heartland.',
     destinations: ['Lalibela', 'Gondar', 'Simien Mountains', 'Bahir Dar & Lake Tana'],
-    days: '7-10 days',
+    days: '7–10 days',
     x: '40%',
     y: '30%',
   },
@@ -19,7 +19,7 @@ const mapRegions = [
     color: '#2D5016',
     description: 'Tribal cultures of the Omo Valley, Rift Valley lakes, hot springs, and extraordinary biodiversity.',
     destinations: ['Arba Minch', 'Omo Valley', 'Bale Mountains', 'Yabello'],
-    days: '8-12 days',
+    days: '8–12 days',
     x: '38%',
     y: '60%',
   },
@@ -29,7 +29,7 @@ const mapRegions = [
     color: '#8B0000',
     description: 'The most extreme and otherworldly route: lava lakes, acid springs, salt deserts, Afar tribes.',
     destinations: ['Danakil Depression', 'Erta Ale Volcano', 'Dallol', 'Harar'],
-    days: '4-6 days',
+    days: '4–6 days',
     x: '68%',
     y: '35%',
   },
@@ -39,19 +39,25 @@ const mapRegions = [
     color: '#1B3A5C',
     description: 'Ancient Aksumite obelisks, cliff-hanging churches, and dramatic sandstone mountain scenery.',
     destinations: ['Gheralta', 'Aksum', 'Adwa', 'Mekelle'],
-    days: '4-5 days',
+    days: '4–5 days',
     x: '52%',
     y: '18%',
   },
 ];
 
-// SVG-based Ethiopia map (simplified outline)
-const ETHIOPIA_PATH = "M 120,30 L 200,20 L 280,40 L 320,80 L 340,130 L 310,160 L 330,210 L 300,250 L 260,280 L 200,300 L 170,280 L 140,300 L 100,280 L 80,240 L 60,200 L 50,160 L 70,120 L 90,80 Z";
+const ETHIOPIA_PATH =
+  'M 120,30 L 200,20 L 280,40 L 320,80 L 340,130 L 310,160 L 330,210 L 300,250 L 260,280 L 200,300 L 170,280 L 140,300 L 100,280 L 80,240 L 60,200 L 50,160 L 70,120 L 90,80 Z';
 
 export default function InteractiveMap() {
   const [activeRegion, setActiveRegion] = useState(null);
   const titleRef = useScrollReveal();
-  const mapRef = useScrollReveal();
+  const mapRef   = useScrollReveal();
+
+  const handleRegionClick = useCallback((region) => {
+    setActiveRegion((prev) => (prev?.id === region.id ? null : region));
+  }, []);
+
+  const clearRegion = useCallback(() => setActiveRegion(null), []);
 
   return (
     <section id="map" className="bg-[#080808] py-28 px-6 overflow-hidden">
@@ -67,29 +73,30 @@ export default function InteractiveMap() {
           <p className="text-white/50 mt-4 max-w-xl mx-auto text-lg font-light">
             Select a travel circuit to discover the highlights, destinations, and ideal duration for each route.
           </p>
-          <div className="w-16 h-px bg-amber-600 mx-auto mt-8" />
+          <div className="w-16 h-px bg-amber-600 mx-auto mt-8" aria-hidden="true" />
         </div>
 
         <div ref={mapRef} className="reveal grid lg:grid-cols-2 gap-12 items-center">
-          {/* Custom SVG Map */}
+          {/* SVG Map */}
           <div className="relative">
             <div className="relative bg-[#0f1a2e] rounded-3xl border border-white/10 p-6 aspect-square max-w-md mx-auto overflow-hidden">
-              {/* Background grid */}
-              <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
+              {/* Grid background */}
+              <svg className="absolute inset-0 w-full h-full opacity-10" aria-hidden="true">
                 <defs>
-                  <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
-                    <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#D4A017" strokeWidth="0.5"/>
+                  <pattern id="map-grid" width="30" height="30" patternUnits="userSpaceOnUse">
+                    <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#D4A017" strokeWidth="0.5" />
                   </pattern>
                 </defs>
-                <rect width="100%" height="100%" fill="url(#grid)" />
+                <rect width="100%" height="100%" fill="url(#map-grid)" />
               </svg>
 
-              {/* Ethiopia silhouette */}
               <svg
                 viewBox="0 0 400 380"
                 className="w-full h-full relative z-10"
-                xmlns="http://www.w3.org/2000/svg"
+                role="img"
+                aria-label="Interactive map of Ethiopia travel routes"
               >
+                <title>Ethiopia travel route map</title>
                 {/* Country outline */}
                 <path
                   d={ETHIOPIA_PATH}
@@ -101,17 +108,26 @@ export default function InteractiveMap() {
                 />
 
                 {/* Route lines */}
-                <path d="M 130,90 L 155,130 L 170,160" stroke="#D4A017" strokeWidth="1.5" fill="none" strokeDasharray="6 3" opacity="0.6"/>
-                <path d="M 170,160 L 190,220 L 170,255" stroke="#2D5016" strokeWidth="1.5" fill="none" strokeDasharray="6 3" opacity="0.6"/>
-                <path d="M 200,80 L 230,110 L 250,150" stroke="#8B0000" strokeWidth="1.5" fill="none" strokeDasharray="6 3" opacity="0.6"/>
+                <path d="M 130,90 L 155,130 L 170,160" stroke="#D4A017" strokeWidth="1.5" fill="none" strokeDasharray="6 3" opacity="0.6" />
+                <path d="M 170,160 L 190,220 L 170,255" stroke="#2D5016" strokeWidth="1.5" fill="none" strokeDasharray="6 3" opacity="0.6" />
+                <path d="M 200,80 L 230,110 L 250,150" stroke="#8B0000" strokeWidth="1.5" fill="none" strokeDasharray="6 3" opacity="0.6" />
 
-                {/* Destination pins */}
-                {mapRegions.map((region) => {
+                {/* Region pins */}
+                {MAP_REGIONS.map((region) => {
                   const cx = parseFloat(region.x) * 3.4;
                   const cy = parseFloat(region.y) * 3.4;
                   const isActive = activeRegion?.id === region.id;
                   return (
-                    <g key={region.id} onClick={() => setActiveRegion(isActive ? null : region)} className="cursor-pointer">
+                    <g
+                      key={region.id}
+                      onClick={() => handleRegionClick(region)}
+                      role="button"
+                      tabIndex={0}
+                      aria-pressed={isActive}
+                      aria-label={`${region.name} – ${region.days}`}
+                      onKeyDown={(e) => e.key === 'Enter' && handleRegionClick(region)}
+                      className="cursor-pointer focus:outline-none"
+                    >
                       <circle
                         cx={cx}
                         cy={cy}
@@ -133,65 +149,71 @@ export default function InteractiveMap() {
                           opacity="0.5"
                           strokeDasharray="4 2"
                         >
-                          <animateTransform attributeName="transform" type="rotate" from={`0 ${cx} ${cy}`} to={`360 ${cx} ${cy}`} dur="4s" repeatCount="indefinite"/>
+                          <animateTransform
+                            attributeName="transform"
+                            type="rotate"
+                            from={`0 ${cx} ${cy}`}
+                            to={`360 ${cx} ${cy}`}
+                            dur="4s"
+                            repeatCount="indefinite"
+                          />
                         </circle>
                       )}
-                      <text x={cx} y={cy + 30} textAnchor="middle" fill="white" fontSize="9" fontWeight="500" opacity="0.8">
+                      <text
+                        x={cx}
+                        y={cy + 30}
+                        textAnchor="middle"
+                        fill="white"
+                        fontSize="9"
+                        fontWeight="500"
+                        opacity="0.8"
+                      >
                         {region.name}
                       </text>
                     </g>
                   );
                 })}
 
-                {/* Ethiopia label */}
                 <text x="170" y="160" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold" opacity="0.3" fontFamily="serif">
                   ETHIOPIA
                 </text>
               </svg>
 
               {/* Compass */}
-              <div className="absolute bottom-4 right-4 w-10 h-10 rounded-full border border-amber-600/40 flex items-center justify-center">
+              <div className="absolute bottom-4 right-4 w-10 h-10 rounded-full border border-amber-600/40 flex items-center justify-center" aria-hidden="true">
                 <span className="text-amber-400 text-xs font-bold">N</span>
               </div>
             </div>
-
-            {/* Click instruction */}
-            <p className="text-center text-white/30 text-sm mt-4">
-              Click a region to explore the route
-            </p>
+            <p className="text-center text-white/30 text-sm mt-4">Click a region to explore the route</p>
           </div>
 
-          {/* Region Detail Panel */}
+          {/* Detail / list panel */}
           <div className="space-y-4">
             {activeRegion ? (
               <div className="bg-[#111] border border-amber-600/30 rounded-3xl p-8 relative">
                 <button
-                  onClick={() => setActiveRegion(null)}
+                  onClick={clearRegion}
                   className="absolute top-4 right-4 text-white/40 hover:text-white transition-colors"
+                  aria-label="Close region detail"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-5 h-5" aria-hidden="true" />
                 </button>
 
-                <div
-                  className="w-12 h-1 rounded-full mb-5"
-                  style={{ backgroundColor: activeRegion.color }}
-                />
-                <h3 className="font-serif text-3xl text-white font-bold mb-2">
-                  {activeRegion.name}
-                </h3>
+                <div className="w-12 h-1 rounded-full mb-5" style={{ backgroundColor: activeRegion.color }} aria-hidden="true" />
+                <h3 className="font-serif text-3xl text-white font-bold mb-2">{activeRegion.name}</h3>
                 <p className="text-amber-400 text-sm mb-4">Recommended: {activeRegion.days}</p>
                 <p className="text-white/60 leading-relaxed mb-6">{activeRegion.description}</p>
 
                 <div>
                   <h4 className="text-white text-sm font-semibold mb-3 tracking-wider uppercase">Key Destinations</h4>
-                  <div className="space-y-2">
+                  <ul className="space-y-2">
                     {activeRegion.destinations.map((dest) => (
-                      <div key={dest} className="flex items-center gap-3 text-white/70">
-                        <MapPin className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                        <span>{dest}</span>
-                      </div>
+                      <li key={dest} className="flex items-center gap-3 text-white/70">
+                        <MapPin className="w-4 h-4 text-amber-400 flex-shrink-0" aria-hidden="true" />
+                        {dest}
+                      </li>
                     ))}
-                  </div>
+                  </ul>
                 </div>
 
                 <a
@@ -202,37 +224,32 @@ export default function InteractiveMap() {
                 </a>
               </div>
             ) : (
-              <div className="space-y-3">
-                {mapRegions.map((region) => (
-                  <button
-                    key={region.id}
-                    onClick={() => setActiveRegion(region)}
-                    className="w-full group flex items-center gap-4 bg-[#111] border border-white/8 hover:border-amber-600/30 rounded-2xl p-5 text-left transition-all duration-300 hover:bg-[#161616]"
-                  >
-                    <div
-                      className="w-4 h-4 rounded-full flex-shrink-0 ring-2 ring-offset-2 ring-offset-[#111]"
-                      style={{ backgroundColor: region.color, ringColor: region.color }}
-                    />
-                    <div className="flex-1">
-                      <div className="text-white font-semibold group-hover:text-amber-400 transition-colors">{region.name}</div>
-                      <div className="text-white/40 text-sm">{region.days}</div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-amber-400 transition-colors" />
-                  </button>
+              <ul className="space-y-3" role="list" aria-label="Travel routes">
+                {MAP_REGIONS.map((region) => (
+                  <li key={region.id}>
+                    <button
+                      onClick={() => handleRegionClick(region)}
+                      className="w-full group flex items-center gap-4 bg-[#111] border border-white/8 hover:border-amber-600/30 rounded-2xl p-5 text-left transition-all duration-300 hover:bg-[#161616]"
+                      aria-label={`${region.name} – ${region.days}`}
+                    >
+                      <div
+                        className="w-4 h-4 rounded-full flex-shrink-0"
+                        style={{ backgroundColor: region.color }}
+                        aria-hidden="true"
+                      />
+                      <div className="flex-1">
+                        <div className="text-white font-semibold group-hover:text-amber-400 transition-colors">{region.name}</div>
+                        <div className="text-white/40 text-sm">{region.days}</div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-amber-400 transition-colors" aria-hidden="true" />
+                    </button>
+                  </li>
                 ))}
-              </div>
+              </ul>
             )}
           </div>
         </div>
       </div>
     </section>
-  );
-}
-
-function ChevronRight({ className }) {
-  return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-    </svg>
   );
 }

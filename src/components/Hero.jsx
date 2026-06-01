@@ -1,6 +1,19 @@
 import { useEffect, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 
+const HERO_STATS = [
+  { value: '3,000+', label: 'Years of History' },
+  { value: '9',      label: 'UNESCO Sites' },
+  { value: '80+',    label: 'Ethnic Groups' },
+];
+
+// Extracted once — never re-created on render
+const GRAIN_STYLE = {
+  backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E")`,
+  backgroundRepeat: 'repeat',
+  backgroundSize: '128px 128px',
+};
+
 export default function Hero() {
   const [loaded, setLoaded] = useState(false);
 
@@ -10,9 +23,12 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden">
+    <section
+      className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden"
+      aria-label="Hero – Discover Ethiopia"
+    >
       {/* Video Background */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0" aria-hidden="true">
         <video
           autoPlay
           muted
@@ -25,19 +41,16 @@ export default function Hero() {
             src="https://www.w3schools.com/howto/rain.mp4"
             type="video/mp4"
           />
-          {/* Fallback image if video fails */}
           <img
             src="https://images.unsplash.com/photo-1619546813926-a78fa6372cd2?w=1920&q=85"
             className="w-full h-full object-cover"
-            alt="Ethiopia landscape"
+            alt=""
           />
         </video>
 
-        {/* Cinematic overlay */}
+        {/* Cinematic overlays */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/50 to-black/80" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40" />
-        
-        {/* Cinematic letterbox bars */}
         <div className="absolute top-0 left-0 right-0 h-16 bg-black/60" />
         <div className="absolute bottom-0 left-0 right-0 h-16 bg-black/60" />
       </div>
@@ -45,11 +58,8 @@ export default function Hero() {
       {/* Grain overlay */}
       <div
         className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E")`,
-          backgroundRepeat: 'repeat',
-          backgroundSize: '128px 128px',
-        }}
+        style={GRAIN_STYLE}
+        aria-hidden="true"
       />
 
       {/* Content */}
@@ -61,7 +71,7 @@ export default function Hero() {
           }`}
         >
           <span className="inline-flex items-center gap-2 text-amber-400 text-sm font-medium tracking-[0.3em] uppercase border border-amber-400/30 px-4 py-1.5 rounded-full">
-            <span className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse" />
+            <span className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse" aria-hidden="true" />
             Land of Origins
           </span>
         </div>
@@ -113,12 +123,9 @@ export default function Hero() {
           className={`mt-16 flex justify-center gap-10 md:gap-16 transition-all duration-1000 delay-1000 ${
             loaded ? 'opacity-100' : 'opacity-0'
           }`}
+          aria-label="Key facts about Ethiopia"
         >
-          {[
-            { value: '3,000+', label: 'Years of History' },
-            { value: '9', label: 'UNESCO Sites' },
-            { value: '80+', label: 'Ethnic Groups' },
-          ].map((stat) => (
+          {HERO_STATS.map((stat) => (
             <div key={stat.label} className="text-center">
               <div className="font-serif text-2xl md:text-3xl font-bold text-amber-400 stat-number">
                 {stat.value}
@@ -132,7 +139,10 @@ export default function Hero() {
       </div>
 
       {/* Scroll indicator */}
-      <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 text-white/50">
+      <div
+        className="absolute bottom-20 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 text-white/50"
+        aria-hidden="true"
+      >
         <span className="text-xs tracking-[0.3em] uppercase">Scroll to explore</span>
         <ChevronDown className="w-4 h-4 animate-bounce" />
       </div>

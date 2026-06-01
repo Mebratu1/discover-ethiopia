@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Menu, X, MapPin } from 'lucide-react';
 
-const navLinks = [
+const NAV_LINKS = [
   { label: 'Destinations', href: '#destinations' },
   { label: 'Map', href: '#map' },
   { label: 'Gallery', href: '#gallery' },
@@ -13,11 +13,17 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 60);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+  const handleScroll = useCallback(() => {
+    setScrolled(window.scrollY > 60);
   }, []);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
+
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+  const toggleMenu = useCallback(() => setMenuOpen((prev) => !prev), []);
 
   return (
     <>
@@ -27,11 +33,13 @@ export default function Navbar() {
             ? 'nav-glass bg-black/80 border-b border-white/10 py-3'
             : 'bg-transparent py-5'
         }`}
+        role="navigation"
+        aria-label="Main navigation"
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           {/* Logo */}
-          <a href="#" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-amber-700 flex items-center justify-center">
+          <a href="#" className="flex items-center gap-2 group" aria-label="Discover Ethiopia – home">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-amber-700 flex items-center justify-center" aria-hidden="true">
               <MapPin className="w-4 h-4 text-white" />
             </div>
             <span className="font-serif text-white text-lg font-bold tracking-wide">
@@ -40,8 +48,8 @@ export default function Navbar() {
           </a>
 
           {/* Desktop Nav */}
-          <ul className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
+          <ul className="hidden md:flex items-center gap-8" role="list">
+            {NAV_LINKS.map((link) => (
               <li key={link.href}>
                 <a
                   href={link.href}
@@ -63,25 +71,30 @@ export default function Navbar() {
 
           {/* Mobile Menu Button */}
           <button
-            onClick={() => setMenuOpen(!menuOpen)}
+            onClick={toggleMenu}
             className="md:hidden text-white p-2"
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
+            aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
           >
-            {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {menuOpen ? <X className="w-6 h-6" aria-hidden="true" /> : <Menu className="w-6 h-6" aria-hidden="true" />}
           </button>
         </div>
       </nav>
 
       {/* Mobile Menu */}
       <div
+        id="mobile-menu"
         className={`fixed inset-0 z-40 bg-black/95 flex flex-col items-center justify-center gap-8 transition-all duration-300 ${
-          menuOpen ? 'opacity-100 pointer-events-all' : 'opacity-0 pointer-events-none'
+          menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
+        aria-hidden={!menuOpen}
       >
-        {navLinks.map((link) => (
+        {NAV_LINKS.map((link) => (
           <a
             key={link.href}
             href={link.href}
-            onClick={() => setMenuOpen(false)}
+            onClick={closeMenu}
             className="text-white text-2xl font-serif font-bold hover:text-amber-400 transition-colors"
           >
             {link.label}
@@ -89,7 +102,7 @@ export default function Navbar() {
         ))}
         <a
           href="#contact"
-          onClick={() => setMenuOpen(false)}
+          onClick={closeMenu}
           className="mt-4 bg-amber-600 text-white text-lg font-semibold px-8 py-3 rounded-full"
         >
           Plan Your Trip

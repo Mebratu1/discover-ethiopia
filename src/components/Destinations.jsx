@@ -1,18 +1,20 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import DestinationCard from './DestinationCard';
 import { destinations } from '../data/destinations';
 
-const categories = ['All', 'Mountains', 'Churches', 'Lakes', 'Culture', 'Wildlife', 'Volcanoes'];
+const CATEGORIES = ['All', 'Mountains', 'Churches', 'Lakes', 'Culture', 'Wildlife', 'Volcanoes'];
 
 export default function Destinations() {
   const [activeCategory, setActiveCategory] = useState('All');
   const titleRef = useScrollReveal();
-  const gridRef = useScrollReveal();
+  const gridRef  = useScrollReveal();
 
   const filtered = activeCategory === 'All'
     ? destinations
-    : destinations.filter(d => d.category === activeCategory);
+    : destinations.filter((d) => d.category === activeCategory);
+
+  const handleCategory = useCallback((cat) => setActiveCategory(cat), []);
 
   return (
     <section id="destinations" className="bg-[#0d0d0d] py-28 px-6">
@@ -28,15 +30,16 @@ export default function Destinations() {
           <p className="text-white/50 mt-4 max-w-xl mx-auto text-lg font-light">
             From volcanic craters to medieval castles — every corner of Ethiopia tells a story 10,000 years in the making.
           </p>
-          <div className="w-16 h-px bg-amber-600 mx-auto mt-8" />
+          <div className="w-16 h-px bg-amber-600 mx-auto mt-8" aria-hidden="true" />
         </div>
 
         {/* Filter Pills */}
-        <div className="flex flex-wrap justify-center gap-3 mb-12">
-          {categories.map((cat) => (
+        <div className="flex flex-wrap justify-center gap-3 mb-12" role="group" aria-label="Filter destinations by category">
+          {CATEGORIES.map((cat) => (
             <button
               key={cat}
-              onClick={() => setActiveCategory(cat)}
+              onClick={() => handleCategory(cat)}
+              aria-pressed={activeCategory === cat}
               className={`px-5 py-2 rounded-full text-sm font-medium tracking-wide transition-all duration-300 ${
                 activeCategory === cat
                   ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/20'
